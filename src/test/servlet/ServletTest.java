@@ -93,4 +93,58 @@ public class ServletTest {
         assertTrue(result.contains("5000000"));
     }
 
+    @Nested
+    @DisplayName("QueryServlet tests")
+    public class queryServletTest {
+        String makeRequest(String command) throws IOException {
+            Mockito.when(requestMock.getParameter("command")).thenReturn(command);
+            Mockito.when(responseMock.getWriter()).thenReturn(printWriter);
+            new QueryServlet().doGet(requestMock, responseMock);
+            Mockito.verify(requestMock, Mockito.atLeastOnce()).getParameter("command");
+            return stringWriter.toString();
+        }
+
+        @Test
+        @DisplayName("Test sum")
+        public void testSum() throws IOException {
+            String result = makeRequest("sum");
+            assertTrue(result.contains("Summary price"));
+            assertTrue(result.contains("18000000"));
+        }
+
+        @Test
+        @DisplayName("Test count")
+        public void testCount() throws IOException {
+            String result = makeRequest("count");
+            assertTrue(result.contains("Number of products"));
+            assertTrue(result.contains("4"));
+        }
+
+        @Test
+        @DisplayName("Test unknown")
+        public void testUnknown() throws IOException {
+            String result = makeRequest("invalid_command");
+            assertTrue(result.contains("Unknown command"));
+            assertTrue(result.contains("invalid_command"));
+        }
+
+        @Test
+        @DisplayName("Car with max price")
+        public void testMin() throws IOException {
+            String result = makeRequest("min");
+            assertTrue(result.contains("min price"));
+            assertTrue(result.contains("Audi"));
+            assertTrue(result.contains("3000000"));
+        }
+
+        @Test
+        @DisplayName("Test max")
+        public void testMax() throws IOException {
+            String result = makeRequest("max");
+            assertTrue(result.contains("max price"));
+            assertTrue(result.contains("Tesla"));
+            assertTrue(result.contains("6000000"));
+        }
+    }
+
 }
