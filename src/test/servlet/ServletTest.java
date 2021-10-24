@@ -5,6 +5,8 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import product.Product;
+import product.ProductOpr;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,6 +44,8 @@ public class ServletTest {
     private HttpServletRequest requestMock;
     @Mock
     private HttpServletResponse responseMock;
+    @Mock
+    private ProductOpr productOprMock;
 
     private StringWriter stringWriter;
     private PrintWriter printWriter;
@@ -60,8 +65,7 @@ public class ServletTest {
         Mockito.when(requestMock.getParameter("price")).thenReturn("6000000");
         Mockito.when(responseMock.getWriter()).thenReturn(printWriter);
 
-        new AddProductServlet().doGet(requestMock, responseMock);
-
+        new AddProductServlet(productOprMock).doGet(requestMock, responseMock);
         Mockito.verify(requestMock, Mockito.atLeastOnce()).getParameter("name");
         Mockito.verify(requestMock, Mockito.atLeastOnce()).getParameter("price");
 
@@ -72,19 +76,20 @@ public class ServletTest {
     @Test
     @DisplayName("Check product list test")
     public void getProductServletTest() throws IOException {
+        Mockito.when(productOprMock.getProduct()).thenReturn(List.of(
+                new Product("Audi", 3000000),
+                new Product("BMW", 4000000),
+                new Product("Mercedes", 5000000),
+                new Product("Tesla", 6000000)
+        ));
         Mockito.when(responseMock.getWriter()).thenReturn(printWriter);
 
-        new GetProductsServlet().doGet(requestMock, responseMock);
-
+        new GetProductsServlet(productOprMock).doGet(requestMock, responseMock);
         String result = stringWriter.toString();
-        assertTrue(result.contains("Tesla"));
-        assertTrue(result.contains("6000000"));
-        assertTrue(result.contains("Audi"));
-        assertTrue(result.contains("3000000"));
-        assertTrue(result.contains("BMW"));
-        assertTrue(result.contains("4000000"));
-        assertTrue(result.contains("Mercedes"));
-        assertTrue(result.contains("5000000"));
+        assertTrue(result.contains("Tesla\t6000000"));
+        assertTrue(result.contains("Audi\t3000000"));
+        assertTrue(result.contains("BMW\t4000000"));
+        assertTrue(result.contains("Mercedes\t5000000"));
     }
 
     @Nested
@@ -93,7 +98,7 @@ public class ServletTest {
         String makeRequest(String command) throws IOException {
             Mockito.when(requestMock.getParameter("command")).thenReturn(command);
             Mockito.when(responseMock.getWriter()).thenReturn(printWriter);
-            new QueryServlet().doGet(requestMock, responseMock);
+            new QueryServlet(productOprMock).doGet(requestMock, responseMock);
             Mockito.verify(requestMock, Mockito.atLeastOnce()).getParameter("command");
             return stringWriter.toString();
         }
@@ -101,6 +106,7 @@ public class ServletTest {
         @Test
         @DisplayName("Test sum")
         public void testSum() throws IOException {
+            Mockito.when(productOprMock.sumProductPrice()).thenReturn(18000000L);
             String result = makeRequest("sum");
             assertTrue(result.contains("Summary price"));
             assertTrue(result.contains("18000000"));
@@ -109,6 +115,7 @@ public class ServletTest {
         @Test
         @DisplayName("Test count")
         public void testCount() throws IOException {
+            Mockito.when(productOprMock.countProducts()).thenReturn(4L);
             String result = makeRequest("count");
             assertTrue(result.contains("Number of products"));
             assertTrue(result.contains("4"));
@@ -125,19 +132,21 @@ public class ServletTest {
         @Test
         @DisplayName("Car with max price")
         public void testMin() throws IOException {
+            Mockito.when(productOprMock.findMinProduct())
+                    .thenReturn(new Product("Audi", 3000000));
             String result = makeRequest("min");
             assertTrue(result.contains("min price"));
-            assertTrue(result.contains("Audi"));
-            assertTrue(result.contains("3000000"));
+            assertTrue(result.contains("Audi\t3000000"));
         }
 
         @Test
         @DisplayName("Test max")
         public void testMax() throws IOException {
+            Mockito.when(productOprMock.findMaxProduct())
+                    .thenReturn(new Product("Tesla", 6000000));
             String result = makeRequest("max");
             assertTrue(result.contains("max price"));
-            assertTrue(result.contains("Tesla"));
-            assertTrue(result.contains("6000000"));
+            assertTrue(result.contains("Tesla\t6000000"));;
         }
     }
 
