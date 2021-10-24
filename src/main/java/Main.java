@@ -7,10 +7,6 @@ import servlet.AddProductServlet;
 import servlet.GetProductsServlet;
 import servlet.QueryServlet;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-
 /**
  * @author akirakozov
  */
