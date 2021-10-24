@@ -35,8 +35,8 @@ public class ProductOpr {
 
             List<Product> products = new ArrayList<>();
             while (rs.next()) {
-                String  name = rs.getString("name");
-                long price  = rs.getLong("price");
+                String name = rs.getString("name");
+                long price = rs.getLong("price");
                 products.add(new Product(name, price));
             }
 
@@ -53,8 +53,8 @@ public class ProductOpr {
             List<Product> products = new ArrayList<>();
 
             while (rs.next()) {
-                String  name = rs.getString("name");
-                long price  = rs.getLong("price");
+                String name = rs.getString("name");
+                long price = rs.getLong("price");
 
                 products.add(new Product(name, price));
             }
@@ -72,8 +72,8 @@ public class ProductOpr {
             List<Product> products = new ArrayList<>();
 
             while (rs.next()) {
-                String  name = rs.getString("name");
-                long price  = rs.getLong("price");
+                String name = rs.getString("name");
+                long price = rs.getLong("price");
 
                 products.add(new Product(name, price));
             }

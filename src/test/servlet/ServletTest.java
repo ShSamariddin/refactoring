@@ -146,7 +146,8 @@ public class ServletTest {
                     .thenReturn(new Product("Tesla", 6000000));
             String result = makeRequest("max");
             assertTrue(result.contains("max price"));
-            assertTrue(result.contains("Tesla\t6000000"));;
+            assertTrue(result.contains("Tesla\t6000000"));
+            ;
         }
     }
 
