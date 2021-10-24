@@ -1,5 +1,6 @@
 package servlet;
 
+import db.DBUtil;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -20,11 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ServletTest {
 
     private static void sqlRequest(String request) {
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-            Statement statement = connection.createStatement();
-
-            statement.executeUpdate(request);
-            statement.close();
+        try (Statement stmt = DBUtil.getStatement()) {
+            stmt.executeUpdate(request);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -32,12 +30,10 @@ public class ServletTest {
     }
 
     @BeforeAll
-    static void initData() {
-        sqlRequest("DROP TABLE IF EXISTS product");
-        sqlRequest("CREATE TABLE IF NOT EXISTS product" +
-                "(id    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                " name  TEXT    NOT NULL, " +
-                " price INT     NOT NULL)");
+    static void initData() throws SQLException {
+        sqlRequest("DROP TABLE IF EXISTS PRODUCT");
+
+        DBUtil.templeDB();
         sqlRequest("INSERT INTO product (name, price) VALUES (\"Audi\", 3000000)");
         sqlRequest("INSERT INTO product (name, price) VALUES (\"BMW\", 4000000)");
         sqlRequest("INSERT INTO product (name, price) VALUES (\"Mercedes\", 5000000)");
